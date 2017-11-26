@@ -28,7 +28,9 @@ def _get_project_slackhooks(project):
     for slackhook in project.slackhooks.all():
         slackhooks.append({
             "id": slackhook.pk,
-            "url": slackhook.url,
+            "url": slackhook.url or getattr(settings,
+                                            "SLACKHOOKS_DEFAULT_URL",
+                                            ""),
             "channel": slackhook.channel,
             "notify_config": {
                 "notify_epic_create": slackhook.notify_epic_create,
@@ -79,7 +81,10 @@ def on_new_history_entry(sender, instance, created, **kwargs):
 
     for slackhook in slackhooks:
         args = [
-            slackhook["url"], slackhook["channel"],
+            slackhook["url"] or getattr(settings,
+                                        "SLACKHOOKS_DEFAULT_URL",
+                                        ""),
+            slackhook["channel"],
             slackhook["notify_config"], obj
         ] + extra_args
 
